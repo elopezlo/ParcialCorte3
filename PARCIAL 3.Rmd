@@ -1,0 +1,84 @@
+---
+title: "Parcial 3"
+author: "Emilio López"
+date: "6/3/2021"
+
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##### Bases de datos
+
+## TEOREMA DEL LÍMITE CENTRAL
+
+Sean $X_1,...,X_n$ variables aleatorias independientes e identicamente distribuidas, con distribución de probabilidad no especificada, con media $\mu$ y varianza finita $\sigma^2$. El promedio muestral $\overline{X}$ tiene una media $\mu$ y varianza $\sigma^2/n$ que tiende a una
+distribución normal conforme $n$ tiende a infinito. Es decir:
+$$(\overline{X}-\mu)/(\sigma/\sqrt(n))~~ -> N(0,1)~~ cuando~n~tiende~a~∞$$ 
+
+
+### Ejemplo
+Si se sabe que la dureza Rockwell de pernos de cierto tipo tiene un valor medio de 50 y desviación estándar de 1,5. Si la distribución es normal, ¿cuál es la probabilidad de que la dureza muestral media para una muestra aleatoria de 9 pernos sea por lo menos 52?
+
+$$x=50$$
+$$\sigma=1.5$$
+$$n=9$$
+$$x== N(50;1.5)$$
+$$Z= (x-\mu)/(\sigma/\sqrt(n))$$
+La probabilidad de que la media muestral sea superior a 52 es:
+$$=P(X\geq52)=1-(X<52)$$
+$$=1-P(Z<(52-50)/(1.5/\sqrt9))$$
+$$=1 -P(Z<4)$$
+$$=1-1$$
+$$=0$$
+
+### EJEMPLO EN R
+
+```{r, include=FALSE}
+library(dplyr)
+library(tidyverse)
+library(gifski)
+library(av)
+library(ggplot2)
+library(gganimate)
+```
+
+```{r Exponencial}
+lambda <- 2
+
+Ejemplo <- function(n){
+  x <- rexp(n = n,rate = lambda)
+  med <- mean(x)
+  (med - 1/lambda)/((1/lambda^2)/sqrt(n))
+}
+Med <- replicate(50, Ejemplo(100))
+Med
+```
+
+### GRÁFICO
+
+#### Orden de la base de datos.
+
+```{r ORDEN}
+Med <- replicate(10, Ejemplo(1:11))
+v<-as.data.frame(Med)
+z<-apply(v, MARGIN=2, as.vector)
+resultados<-c(z[,1:nrow(v)-1])
+ns<-rep(1:nrow(v), each=ncol(v))
+y<-cbind(ns, resultados)
+Y<-as.data.frame(y);Y
+```
+
+#### Gráfico
+```{r GRAFICO}
+a<-ggplot(data=data.frame(x=Y), aes(x=resultados)) +
+  geom_histogram(aes(y=..density..), col= "black", fill = "gray62") + geom_density(col=4, size=2)+
+  stat_function(fun = dnorm, colour = "red", size =2)+
+theme_classic();a
+
+
+anim <- a + transition_states(ns, transition_length = 2, state_length = 1) 
+
+```
+
+## GRACIAS!
